@@ -1,5 +1,11 @@
+from aiohttp import ClientSession
 from fastapi import Depends, FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+
+from . import osf
+
+from dotenv import load_dotenv
+load_dotenv()
 
 app = FastAPI()
 origins = [
@@ -16,23 +22,18 @@ app.add_middleware(
     allow_headers = ["*"],
 )
 
-async def dictionary_dependency(value: str) -> dict[str, str]:
-    return {"value": value}
+async def yield_session():
+    session = ClientSession()
+    try:
+        yield session
+    finally:
+        await session.close()
 
-class ClassDependency:
-    def __init__(self, value: str):
-        self.value = value
-
-@app.get('/')
-async def hello(
-    request: Request,
-    class_dep: ClassDependency = Depends(ClassDependency),
-    dict_dep: dict[str, str] = Depends(dictionary_dependency),
-) -> Response:
-    '''
-    These dependencies inject query parameters into the API route.
-    '''
-    v1 = class_dep.value
-    v2 = dict_dep['value']
-    print(v1,v2)
-    return 'Hello World!'
+@app.get('/public-collections')
+async def retrieve_all_collections_that_are_publically_available_on_osf(
+    session = Depends(yield_session),
+):
+    collections = []
+    async for data in  osf.get_collections(session):
+        collections = [*collections, *data]
+    return collections
