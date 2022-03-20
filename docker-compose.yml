@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  api:
+    container_name: api
+    hostname: api
+    build:
+      context: api
+      dockerfile: Dockerfile
+    restart: on-failure
+    networks:
+      - osf-network
+    expose:
+      - "8000"
+    ports: 
+      - 8000:8000
+    depends_on: 
+      - mongo
+    volumes:
+      - ./api/src:/var/www/osf-etl-api/src:cached
+  mongo:
+    container_name: mongo
+    hostname: mongo
+    image: mongo:latest
+    networks:
+      - osf-network
+    ports:
+      - 27017:27017
+    volumes:
+      - osf-mongo-data:/data/db
+
+networks:
+  osf-network:
+    driver: bridge
+
+volumes:
+  osf-mongo-data:
