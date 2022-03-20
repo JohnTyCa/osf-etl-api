@@ -1,6 +1,6 @@
 # OpenScience Framework (OSF) Extract-Transform-Load (ETL) Pipeline and API
 
-This repository hosts an OpenSource API capable of performing ETL processes upon data files from the OpenScience Framework API in certain formats.
+This repository hosts an OpenSource API capable of performing ETL processes upon data files in certain formats from the OpenScience Framework API.
 
 In its first iteration, it will be able to ingest .bdf files into a MongoDB document store from which endpoints will expose this data in JSON format.
 Such data will be publically available through any exposed endpoints and then presented on a future web-app.
